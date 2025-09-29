@@ -41,13 +41,60 @@ class AcademicReportBot:
         await update.message.reply_text(
             "🎓 Welcome to Academic Report Generator Bot!\n\n"
             "I'll help you create a professional academic report in both Word (.docx) and PDF formats.\n\n"
-            "Let's start by entering the title of your report:"
+            "📋 **What I'll ask you:**\n"
+            "• Report title\n"
+            "• Language (English/Arabic)\n"
+            "• Student & professor names\n"
+            "• University, college, department\n"
+            "• Academic year\n"
+            "• Number of pages (5-40)\n"
+            "• Reference style (APA/IEEE/MLA/Harvard/Chicago)\n\n"
+            "📄 **What you'll get:**\n"
+            "• Professional .docx file\n"
+            "• PDF version\n"
+            "• Proper formatting (Times New Roman, 1.5 spacing)\n"
+            "• Complete structure with cover, TOC, sections, references\n\n"
+            "Let's start! Please enter the title of your report:"
         )
         return TITLE
 
+    async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Show help information."""
+        help_text = """
+🎓 **Academic Report Generator Bot**
+
+**Commands:**
+/start - Create a new academic report
+/help - Show this help message
+/cancel - Cancel current report generation
+
+**Features:**
+• Generates professional academic reports
+• Supports both .docx and .pdf formats
+• Multiple reference styles (APA, IEEE, MLA, Harvard, Chicago)
+• English and Arabic language support
+• Configurable length (5-40 pages)
+• Professional formatting and structure
+
+**Bot Flow:**
+1. Title → 2. Language → 3. Student → 4. Professor → 5. University → 6. College → 7. Department → 8. Year → 9. Pages → 10. Reference Style
+
+The bot will then generate and send your report files!
+
+Use /start to begin creating a report.
+        """
+        await update.message.reply_text(help_text.strip())
+
     async def get_title(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         """Store title and ask for language."""
-        context.user_data['title'] = update.message.text
+        title = update.message.text.strip()
+        if not title:
+            await update.message.reply_text(
+                "Please enter a valid title for your report:"
+            )
+            return TITLE
+            
+        context.user_data['title'] = title
         
         keyboard = [['English', 'Arabic']]
         reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
@@ -269,6 +316,9 @@ def main():
     )
     
     application.add_handler(conv_handler)
+    
+    # Add help command handler
+    application.add_handler(CommandHandler('help', bot.help_command))
     
     # Start the bot
     logger.info("Starting Academic Report Bot...")

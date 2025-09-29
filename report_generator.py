@@ -96,42 +96,68 @@ class ReportGenerator:
         # Page break
         doc.add_page_break()
     
-    def _create_table_of_contents(self, doc: Document):
+    def _create_table_of_contents(self, doc: Document, data: Dict[str, Any]):
         """Create table of contents."""
-        toc_heading = doc.add_heading('Table of Contents', level=1)
+        if data['language'] == 'AR':
+            toc_title = 'جدول المحتويات'
+            toc_items = [
+                "1. المقدمة",
+                "2. مراجعة الأدبيات", 
+                "3. المنهجية",
+                "4. النتائج والمناقشة",
+                "5. التحليل",
+                "6. الخاتمة",
+                "7. المراجع"
+            ]
+        else:
+            toc_title = 'Table of Contents'
+            toc_items = [
+                "1. Introduction",
+                "2. Literature Review", 
+                "3. Methodology",
+                "4. Results and Discussion",
+                "5. Analysis",
+                "6. Conclusion",
+                "7. References"
+            ]
+        
+        toc_heading = doc.add_heading(toc_title, level=1)
         toc_heading.alignment = WD_ALIGN_PARAGRAPH.CENTER
         self._set_font_and_spacing(toc_heading, font_size=16)
-        
-        # TOC entries (without page numbers as requested)
-        toc_items = [
-            "1. Introduction",
-            "2. Literature Review", 
-            "3. Methodology",
-            "4. Results and Discussion",
-            "5. Analysis",
-            "6. Conclusion",
-            "7. References"
-        ]
         
         for item in toc_items:
             toc_p = doc.add_paragraph(item)
             toc_p.paragraph_format.left_indent = Inches(0.5)
+            # Align Arabic text to the right
+            if data['language'] == 'AR':
+                toc_p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
             self._set_font_and_spacing(toc_p)
         
         doc.add_page_break()
     
     def _create_introduction(self, doc: Document, data: Dict[str, Any]):
         """Create introduction section."""
-        heading = doc.add_heading('1. Introduction', level=1)
+        if data['language'] == 'AR':
+            heading_text = '1. المقدمة'
+            intro_text = f"""
+            يقدم هذا التقرير تحليلاً شاملاً لموضوع {data['title']}. تهدف هذه الدراسة إلى توفير رؤى قيمة والمساهمة في المعرفة الموجودة في هذا المجال.
+            
+            الهدف الأساسي من هذا البحث هو فحص الجوانب المختلفة للموضوع وتقديم النتائج التي تتسم بالصرامة الأكاديمية والأهمية العملية. تحدد هذه المقدمة نطاق الدراسة ومنهجيتها وأهميتها.
+            
+            يتم تنظيم التقرير لتوفير تدفق منطقي للمعلومات، بدءاً من مراجعة شاملة للأدبيات، متبوعة بالمنهجية المستخدمة، وعرض النتائج، والتحليل المفصل، والملاحظات الختامية.
+            """
+        else:
+            heading_text = '1. Introduction'
+            intro_text = f"""
+            This report presents a comprehensive analysis of {data['title']}. The study aims to provide valuable insights and contribute to the existing body of knowledge in this field. 
+            
+            The primary objective of this research is to examine the various aspects of the topic and present findings that are both academically rigorous and practically relevant. This introduction outlines the scope, methodology, and significance of the study.
+            
+            The report is structured to provide a logical flow of information, beginning with a thorough literature review, followed by the methodology employed, presentation of results, detailed analysis, and concluding remarks. Each section builds upon the previous one to create a cohesive and comprehensive academic document.
+            """
+        
+        heading = doc.add_heading(heading_text, level=1)
         self._set_font_and_spacing(heading, font_size=16)
-        
-        intro_text = f"""
-        This report presents a comprehensive analysis of {data['title']}. The study aims to provide valuable insights and contribute to the existing body of knowledge in this field. 
-        
-        The primary objective of this research is to examine the various aspects of the topic and present findings that are both academically rigorous and practically relevant. This introduction outlines the scope, methodology, and significance of the study.
-        
-        The report is structured to provide a logical flow of information, beginning with a thorough literature review, followed by the methodology employed, presentation of results, detailed analysis, and concluding remarks. Each section builds upon the previous one to create a cohesive and comprehensive academic document.
-        """
         
         self._add_styled_paragraph(doc, intro_text.strip())
     
@@ -249,7 +275,7 @@ class ReportGenerator:
         
         # Create sections
         self._create_cover_page(doc, data)
-        self._create_table_of_contents(doc)
+        self._create_table_of_contents(doc, data)
         self._create_introduction(doc, data)
         self._create_body_sections(doc, data['pages'])
         self._create_conclusion(doc, data)
