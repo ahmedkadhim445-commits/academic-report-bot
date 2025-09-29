@@ -1,0 +1,4 @@
+python-telegram-bot==20.7
+python-docx==0.8.11
+docx2pdf==0.1.8
+python-dotenv==1.0.1
